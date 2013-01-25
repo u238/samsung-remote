@@ -15,6 +15,7 @@ a = Mechanize.new { |agent|
   agent.user_agent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.52 Safari/537.17'
 }
 a.log =  Logger.new "mech.log"
+RestClient.log = Logger.new "foo.logcat "
 
 login_page = a.post('https://account.samsung.com/account/check.do', {
   :actionID => "StartAP",
@@ -58,16 +59,17 @@ finish_sso = start_sso.form.submit
 # pp a
 # TODO Bother with DeviceView proxy?
 
+
 class SamsungDeviceProxy
-  def initialize(cookies)
+  def initialize(cookies, config)
     @options = {
       'master_duid' => "",
       'duid' => config['duid'],
-      'Accept' => 'application/xml, text/xml, */*; q=0.01',
-      'Cookie' => ""
+      :Accept => 'application/xml, text/xml, */*; q=0.01',
+      :Cookie => ""
     }
 
-    @options['Cookie'] = cookies.collect { |cookie| 
+    @options[:Cookie] = cookies.collect { |cookie| 
       cookie.to_s 
     }.join("; ")
 
@@ -81,17 +83,9 @@ class SamsungDeviceProxy
 end
 
 class SamsungCommunicationProxy
-  def initialize(cookies)
-    @options = {
-      'master_duid' => "",
-      'duid' => config['duid'],
-      'Accept' => 'application/xml, text/xml, */*; q=0.01',
-      'Cookie' => ""
-    }
+  def initialize(cookies, config)
+    @options = {}
 
-    @options['Cookie'] = cookies.collect { |cookie| 
-      cookie.to_s 
-    }.join("; ")
   end
 
   #
@@ -117,7 +111,8 @@ class SamsungCommunicationProxy
   # Response will include a CommandId, which can be polled for success via checkControl()
   #
   def setControl(xml)
-    result = RestClient.post('http://global.samsungsmartappliance.com/Communication/setControl', xml, @options.merge('content-type' => 'text/xml'))
+      result = RestClient.post('http://global.samsungsmartappliance.com/Communication/setControl', xml, @options.merge(:content_type => 'text/xml'))
+
 
     Nokogiri::XML(result)
   end
@@ -136,7 +131,7 @@ class SamsungCommunicationProxy
 
 end
 
-# A particular air conditioner
+# A particular air conditionerco
 class Boracay
   def initialize(communication_proxy)
     @communication_proxy = communication_proxy
@@ -237,10 +232,29 @@ class Boracay
   end
 end
 
-proxy = SamsungCommunicationProxy.new(a.cookies)
+
+
+options = {
+  :cookie => ""
+}
+
+options[:cookie] = a.cookies.collect { |cookie| 
+  cookie.to_s 
+}.join("; ")
+
+RestClient.add_before_execution_proc do |req, params|
+  req.add_field 'master_duid', ""
+  req.add_field 'duid', config['duid']
+  req.add_field 'accept', 'application/xml, text/xml, */*; q=0.01'
+  req.add_field 'cookie', options[:cookie]
+end
+
+proxy = SamsungCommunicationProxy.new(a.cookies, config)
 boracay = Boracay.new(proxy)
 boracay.on()
+sleep(10)
 boracay.operation_mode('Cool')
+sleep(10)
 boracay.set_temperature(22)
-sleep(60)
+sleep(20)
 boracay.off()
