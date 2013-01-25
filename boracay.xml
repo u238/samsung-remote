@@ -1,0 +1,82 @@
+<rsp stat="ok">
+  <selectedDevice DUID="7825AD103D06" MASTER_DUID="" ModelID="BORACAY" ModelGroup="RAC_12K" ProguctGroup="RAC" DeviceName="Smart A/C(7825AD103D06)">
+    <ModelInfo ModelID="BORACAY">
+      <Power type="string">
+        <AvailableList>
+          <On/>
+          <Off/>
+        </AvailableList>
+      </Power>
+      <OperationMode type="string">
+        <AvailableList>
+          <Auto/>
+          <Cool/>
+          <Dry/>
+          <Wind/>
+          <Heat/>
+        </AvailableList>
+      </OperationMode>
+      <TempSet type="int">
+        <AvailableList>
+          <AvailableRange MinValue="16" MaxValue="23" Interval="1">
+            <DependencySet>
+              <Dependency RestrictionItem="OperationMode" ErrorCode="OP001">
+                <PermittedValue Value="Auto"/>
+                <PermittedValue Value="Heat"/>
+                <PermittedValue Value="Cool"/>
+              </Dependency>
+              <Dependency RestrictionItem="ConvenientMode" ErrorCode="OP001">
+                <PermittedValue Value="Off"/>
+                <PermittedValue Value="Quiet"/>
+                <PermittedValue Value="Sleep"/>
+                <PermittedValue Value="DlightCool"/>
+              </Dependency>
+            </DependencySet>
+          </AvailableRange>
+          <AvailableRange MinValue="24" MaxValue="30" Interval="1">
+            <DependencySet>
+              <Dependency RestrictionItem="OperationMode" ErrorCode="OP001">
+                <PermittedValue Value="Auto"/>
+                <PermittedValue Value="Heat"/>
+                <PermittedValue Value="Cool"/>
+              </Dependency>
+            </DependencySet>
+          </AvailableRange>
+        </AvailableList>
+      </TempSet>
+      <Spi type="string">
+        <AvailableList>
+          <On/>
+          <Off/>
+        </AvailableList>
+      </Spi>
+      <ConvenientMode type="string">
+        <AvailableList>
+          <Off/>
+          <Smart>
+            <DependencySet>
+              <Dependency RestrictionItem="Power" ErrorCode="OP011">
+                <PermittedValue Value="On"/>
+              </Dependency>
+              <Dependency RestrictionItem="OperationMode" ErrorCode="OP011">
+                <PermittedValue Value="Cool"/>
+              </Dependency>
+            </DependencySet>
+          </Smart>
+          <Quiet/>
+          <Sleep/>
+          <DlightCool>
+            <DependencySet>
+              <Dependency RestrictionItem="Power" ErrorCode="OP011">
+                <PermittedValue Value="On"/>
+              </Dependency>
+              <Dependency RestrictionItem="OperationMode" ErrorCode="OP011">
+                <PermittedValue Value="Cool"/>
+              </Dependency>
+            </DependencySet>
+          </DlightCool>
+        </AvailableList>
+      </ConvenientMode>
+    </ModelInfo>
+  </selectedDevice>
+</rsp>

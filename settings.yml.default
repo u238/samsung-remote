@@ -1,3 +1,4 @@
 ---
 user: 'daniel.oconnor@example.com'
 pass: 'password'
+duid: "7825AD103D06" # Your AC's MAC address, without :

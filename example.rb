@@ -3,17 +3,18 @@ require "bundler/setup"
 
 
 require 'nokogiri'
-require 'open-uri'
+require 'rest_client'
 require 'mechanize'
 require 'yaml'
+
+require 'logger'
+
 config = YAML.load_file('settings.yml')
 
-
-
 a = Mechanize.new { |agent|
-  #agent.user_agent_alias = 'Mac Safari'
   agent.user_agent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.52 Safari/537.17'
 }
+a.log =  Logger.new "mech.log"
 
 login_page = a.post('https://account.samsung.com/account/check.do', {
   :actionID => "StartAP",
@@ -39,63 +40,207 @@ login_page.form['serviceID'] = 'n7yqc6udv2'
 login_page.form['remIdCheck'] = 'on'
 login_page.form.action = 'https://account.samsung.com/account/startSignIn.do'
 
-result = login_page.form.submit
+start_sso = login_page.form.submit
+finish_sso = start_sso.form.submit
 
-puts result.inspect
+# We now should have cookies!
 
+# result = a.get(
+#   'http://global.samsungsmartappliance.com/Communication/selectDevice?_=1359113706632', 
+#   [],
+#   'http://global.samsungsmartappliance.com/',
+#   {
+#     'master_duid' => "",
+#     'duid' => "7825AD103D06",
+#     'accept' => 'application/xml, text/xml, */*; q=0.01'
+#   }
+# )
+# pp a
+# TODO Bother with DeviceView proxy?
 
+class SamsungDeviceProxy
+  def initialize(cookies)
+    @options = {
+      'master_duid' => "",
+      'duid' => config['duid'],
+      'Accept' => 'application/xml, text/xml, */*; q=0.01',
+      'Cookie' => ""
+    }
 
-#<input type="hidden" name="serviceID" value="n7yqc6udv2">
-#startSignIn.do
-#/account
-# 1.30s2ms
-# SSOSignIn
-# global.samsungsmartappliance.com/UserMgr
-# 4.53s0ms
-# SignInResult
-# global.samsungsmartappliance.com/UserMgr
-# 367ms0ms
-# global.samsungsmartappliance.com
-# global.samsungsmartappliance.com
+    @options['Cookie'] = cookies.collect { |cookie| 
+      cookie.to_s 
+    }.join("; ")
 
-# HeadersPreviewResponseCookiesTiming
-# Request URL:https://account.samsung.com/account/startSignIn.do
-# Request Method:POST
-# Status Code:200 OK
-# Request Headersview source
-# Accept:text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
-# Accept-Charset:ISO-8859-1,utf-8;q=0.7,*;q=0.3
-# Accept-Encoding:gzip,deflate,sdch
-# Accept-Language:en-GB,en-US;q=0.8,en;q=0.6
-# Cache-Control:max-age=0
-# Connection:keep-alive
-# Content-Length:97
-# Content-Type:application/x-www-form-urlencoded
-# Cookie:DocType=HTML5; country_codes=au; WMONID=DxtdbDcH4dR; JSESSIONID=D7rtRBlLwzThvtbyNXq3Tf9SjzjYRjWTmbLFWktGMGhQJzNrwMFh!-965434118!-789712369; uid=k6negvc0xf; dotcomSiteCode=au; s_cc=true; s_lv=1359032254952; s_lv_s=Less%20than%201%20day; s_prop25=logged%20out; s_pv=au%3Aconsumer%3Ahome%20appliances%3Aairconditioner; s_sq=%5B%5BB%5D%5D; s_vi=[CS]v1|28809289850111BC-6000160640014F4E[CE]; fsr.s={"rid"=> "d1159f3-80523910-e962-a7c8-227df","ru"=> "https://www.google.com.au/","r"=> "www.google.com.au","st"=> "","to":3,"v":1,"c"=> "http://www.samsung.com/au/consumer/home-appliances/airconditioner","pv":2,"lc":{"d0":{"v":2,"s":false}},"cd":0}; s_ppv=30; serviceID=n7yqc6udv2; goBackURL=http://global.samsungsmartappliance.com/Home/Index; stopWatchStart=1359033104941; userid=daniel.oconnor%40gmail.com
-# Host:account.samsung.com
-# Origin:https://account.samsung.com
-# Referer:https://account.samsung.com/account/check.do
-# User-Agent:Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.52 Safari/537.17
-# Form Dataview sourceview URL encoded
-# serviceID:n7yqc6udv2
-# inputUserID:daniel.oconnor@gmail.com
-# inputPassword:udlhpAQ01
-# remIdCheck:on
-# Response Headersview source
-# Cache-Control:no-cache, no-store, must-revalidate
-# Connection:Keep-Alive
-# Content-Encoding:gzip
-# Content-Language:en-GB
-# Content-Type:text/html; charset=UTF-8
-# Date:Thu, 24 Jan 2013 13:11:47 GMT
-# Expires:Thu, 01 Jan 1970 00:00:00 GMT
-# Keep-Alive:timeout=5, max=10000
-# Pragma:no-cache
-# Server:Apache
-# Set-Cookie:iPlanetDirectoryPro=AQIC5wM2LY4SfcxWHKhMHS1kQ%2FSAcw06%2F7viJeNhIEodD78%3D%40AAJTSQACMDIAAlMxAAIwMw%3D%3D%23; domain=.samsung.com; path=/
-# Set-Cookie:uid=k6negvc0xf; domain=.samsung.com; path=/
-# Set-Cookie:iPlanetDirectoryPro=AQIC5wM2LY4SfcxWHKhMHS1kQ%2FSAcw06%2F7viJeNhIEodD78%3D%40AAJTSQACMDIAAlMxAAIwMw%3D%3D%23; path=/
-# Set-Cookie:uid=k6negvc0xf; path=/
-# Transfer-Encoding:chunked
-# Vary:Accept-Encoding,User-Agent
-# X-Powered-By:Servlet/2.5 JSP/2.1
+  end
+
+  def getDeviceState()
+    result = RestClient.get('http://global.samsungsmartappliance.com/Device/getDeviceState?_=1359113709621', @options)
+    
+    Nokogiri::XML(result)
+  end 
+end
+
+class SamsungCommunicationProxy
+  def initialize(cookies)
+    @options = {
+      'master_duid' => "",
+      'duid' => config['duid'],
+      'Accept' => 'application/xml, text/xml, */*; q=0.01',
+      'Cookie' => ""
+    }
+
+    @options['Cookie'] = cookies.collect { |cookie| 
+      cookie.to_s 
+    }.join("; ")
+  end
+
+  #
+  # Execute a 'selectDevice' call, returning the capabilities of the air conditioner.
+  #
+  # This appears to be the kind of file a UPnP discovery would look for too.
+  #
+  def selectDevice()
+    result = RestClient.get('http://global.samsungsmartappliance.com/Communication/selectDevice?_=1359113706632', @options)
+    
+    Nokogiri::XML(result)
+  end
+
+  def getDeviceState()
+    result = RestClient.get('http://global.samsungsmartappliance.com/Communication/getDeviceState?_=1359113709621', @options)
+    
+    Nokogiri::XML(result)
+  end
+
+  #
+  # Sends a command to the device.
+  #
+  # Response will include a CommandId, which can be polled for success via checkControl()
+  #
+  def setControl(xml)
+    result = RestClient.post('http://global.samsungsmartappliance.com/Communication/setControl', xml, @options.merge('content-type' => 'text/xml'))
+
+    Nokogiri::XML(result)
+  end
+
+  #
+  # Poll for the status of a previously sent command.
+  #
+  # <rsp stat="ok"><ControlResult DUID="...">Processing</ControlResult></rsp>
+  # <rsp stat="ok"><ControlResult DUID="...">Success</ControlResult></rsp>
+  #
+  def checkControl(id)
+   result = RestClient.get('http://global.samsungsmartappliance.com/Communication/checkControl?_=1359117596992', @options.merge('CommandId' => id))
+
+    Nokogiri::XML(result) 
+  end
+
+end
+
+# A particular air conditioner
+class Boracay
+  def initialize(communication_proxy)
+    @communication_proxy = communication_proxy
+  end
+
+  def on
+    @communication_proxy.setControl('<ControlCommand LastUpdateTime="1359114535"><Device><Status Power="On" /></Device></ControlCommand>')
+  end
+
+  def off
+    @communication_proxy.setControl('<ControlCommand LastUpdateTime="1359114535"><Device><Status Power="Off" /></Device></ControlCommand>')    
+  end
+
+  # <OperationMode type="string">
+  #   <AvailableList>
+  #     <Auto/>
+  #     <Cool/>
+  #     <Dry/>
+  #     <Wind/>
+  #     <Heat/>
+  #   </AvailableList>
+  # </OperationMode> 
+  def operation_mode(type)
+    @communication_proxy.setControl('<ControlCommand LastUpdateTime="1359118485" ><Device><Status OperationMode="#{type}" /></Device></ControlCommand>')    
+  end
+
+  # <TempSet type="int">
+  #   <AvailableList>
+  #     <AvailableRange MinValue="16" MaxValue="23" Interval="1">
+  #       <DependencySet>
+  #         <Dependency RestrictionItem="OperationMode" ErrorCode="OP001">
+  #           <PermittedValue Value="Auto"/>
+  #           <PermittedValue Value="Heat"/>
+  #           <PermittedValue Value="Cool"/>
+  #         </Dependency>
+  #         <Dependency RestrictionItem="ConvenientMode" ErrorCode="OP001">
+  #           <PermittedValue Value="Off"/>
+  #           <PermittedValue Value="Quiet"/>
+  #           <PermittedValue Value="Sleep"/>
+  #           <PermittedValue Value="DlightCool"/>
+  #         </Dependency>
+  #       </DependencySet>
+  #     </AvailableRange>
+  #     <AvailableRange MinValue="24" MaxValue="30" Interval="1">
+  #       <DependencySet>
+  #         <Dependency RestrictionItem="OperationMode" ErrorCode="OP001">
+  #           <PermittedValue Value="Auto"/>
+  #           <PermittedValue Value="Heat"/>
+  #           <PermittedValue Value="Cool"/>
+  #         </Dependency>
+  #       </DependencySet>
+  #     </AvailableRange>
+  #   </AvailableList>
+  # </TempSet>
+  def set_temperature(temp)
+    @communication_proxy.setControl('<ControlCommand LastUpdateTime="1359118580" ><Device><Status TempSet="#{temp}" /></Device></ControlCommand>')      
+  end
+
+  # <Spi type="string">
+  #   <AvailableList>
+  #     <On/>
+  #     <Off/>
+  #   </AvailableList>
+  # </Spi>
+  def set_spi
+    raise "Not yet implemented"
+  end
+
+# <ConvenientMode type="string">
+#         <AvailableList>
+#           <Off/>
+#           <Smart>
+#             <DependencySet>
+#               <Dependency RestrictionItem="Power" ErrorCode="OP011">
+#                 <PermittedValue Value="On"/>
+#               </Dependency>
+#               <Dependency RestrictionItem="OperationMode" ErrorCode="OP011">
+#                 <PermittedValue Value="Cool"/>
+#               </Dependency>
+#             </DependencySet>
+#           </Smart>
+#           <Quiet/>
+#           <Sleep/>
+#           <DlightCool>
+#             <DependencySet>
+#               <Dependency RestrictionItem="Power" ErrorCode="OP011">
+#                 <PermittedValue Value="On"/>
+#               </Dependency>
+#               <Dependency RestrictionItem="OperationMode" ErrorCode="OP011">
+#                 <PermittedValue Value="Cool"/>
+#               </Dependency>
+#             </DependencySet>
+#           </DlightCool>
+#         </AvailableList>
+#       </ConvenientMode>
+  def set_convient_mode
+    raise 'Not yet implemented'
+  end
+end
+
+proxy = SamsungCommunicationProxy.new(a.cookies)
+boracay = Boracay.new(proxy)
+boracay.on()
+boracay.operation_mode('Cool')
+boracay.set_temperature(22)
+sleep(60)
+boracay.off()
