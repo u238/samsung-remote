@@ -1,4 +1,5 @@
 ---
 user: 'daniel.oconnor@example.com'
 pass: 'password'
-duid: "7825AD103D06" # Your AC's MAC address, without :
+duid: "7825AD103D06" # Your AC's MAC address, without colons
+user_agent: 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.52 Safari/537.17'
