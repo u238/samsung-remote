@@ -15,8 +15,12 @@ module Samsung
 
     end
 
+    def timestamp
+      Time.now.to_i.to_s
+    end
+
     def action(name)
-      "http://global.samsungsmartappliance.com/Device/#{name}?_=1359113706632"
+      "http://global.samsungsmartappliance.com/Device/#{name}?_=#{timestamp}"
     end
 
     def getDeviceState()
@@ -27,9 +31,12 @@ module Samsung
   end
 
   class CommunicationProxy
+    def timestamp
+      Time.now.to_i.to_s
+    end
 
     def action(name)
-      "http://global.samsungsmartappliance.com/Communication/#{name}?_=1359113706632"
+      "http://global.samsungsmartappliance.com/Communication/#{name}?_=#{timestamp}"
     end
 
     #
@@ -43,7 +50,7 @@ module Samsung
       Nokogiri::XML(result)
     end
 
-    def getDeviceState()
+    def getDeviceState(headers)
       result = RestClient.get(action('getDeviceState'))
       
       Nokogiri::XML(result)
@@ -86,11 +93,15 @@ module Samsung
     end
 
     def on
-      @communication_proxy.setControl('<ControlCommand LastUpdateTime="1359114535"><Device><Status Power="On" /></Device></ControlCommand>', @headers)
+      @communication_proxy.setControl('<ControlCommand LastUpdateTime="' + timestamp + '"><Device><Status Power="On" /></Device></ControlCommand>', @headers)
     end
 
     def off
-      @communication_proxy.setControl('<ControlCommand LastUpdateTime="1359114535"><Device><Status Power="Off" /></Device></ControlCommand>', @headers)    
+      @communication_proxy.setControl('<ControlCommand LastUpdateTime="' + timestamp + '"><Device><Status Power="Off" /></Device></ControlCommand>', @headers)    
+    end
+
+    def timestamp
+      Time.now.to_i.to_s
     end
 
     # <OperationMode type="string">
@@ -103,7 +114,12 @@ module Samsung
     #   </AvailableList>
     # </OperationMode> 
     def operation_mode(type)
-      @communication_proxy.setControl('<ControlCommand LastUpdateTime="1359118485" ><Device><Status OperationMode="#{type}" /></Device></ControlCommand>', @headers)    
+      mode = type.capitalize
+      modes = ['Auto', 'Cool', 'Dry', 'Wind', 'Heat']
+      if modes.index(mode) == nil
+        raise "Invalid operation mode, " + mode + " is not one of " + modes.inspect
+      end
+      @communication_proxy.setControl('<ControlCommand LastUpdateTime="' + timestamp + '"><Device><Status OperationMode="' + mode + '" /></Device></ControlCommand>', @headers)    
     end
 
     # <TempSet type="int">
@@ -135,7 +151,15 @@ module Samsung
     #   </AvailableList>
     # </TempSet>
     def set_temperature(temp)
-      @communication_proxy.setControl('<ControlCommand LastUpdateTime="1359118580" ><Device><Status TempSet="#{temp}" /></Device></ControlCommand>', @headers)      
+      headers = {}
+      headers['Accept'] = @headers['accept']
+      headers['Cookie'] = @headers['cookie']
+      headers['Origin'] = 'http://global.samsungsmartappliance.com'
+      headers['Referer'] = 'http://global.samsungsmartappliance.com/'
+      headers['X-Requested-With'] = 'XMLHttpRequest'
+      headers["Content-Type"] = 'text/xml'
+
+      @communication_proxy.setControl('<ControlCommand LastUpdateTime="' + timestamp + '" ><Device><Status TempSet="' + temp.to_i.to_s + '" /></Device></ControlCommand>', headers)      
     end
 
     # <Spi type="string">
@@ -178,6 +202,10 @@ module Samsung
     def set_convient_mode
       raise 'Not yet implemented'
     end
+
+    def info
+      @communication_proxy.getDeviceState(@headers)
+    end
   end
 
   class Authenticator
@@ -205,7 +233,7 @@ module Samsung
 
       login_page.form['inputUserID'] = user
       login_page.form['inputPassword'] = pass
-      login_page.form['serviceID'] = 'n7yqc6udv2'
+      login_page.form['serviceID'] = service_id
       login_page.form['remIdCheck'] = 'on'
       login_page.form.action = 'https://account.samsung.com/account/startSignIn.do'
 
