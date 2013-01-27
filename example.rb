@@ -1,6 +1,6 @@
 require 'rubygems'
 require "bundler/setup"
-require 'lib/samsung'
+require './lib/samsung'
 
 require 'nokogiri'
 require 'rest_client'
