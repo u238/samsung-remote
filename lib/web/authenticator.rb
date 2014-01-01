@@ -1,8 +1,12 @@
 class Samsung::Web::Authenticator
+  def initialize(log)
+    @log = log
+  end
   #
   # Login with a configured Mechanize agent to obtain a session cookie
   #
   def login(agent, user, pass, service_id)
+    @log.info("Login...")
     login_page = agent.post('https://account.samsung.com/account/check.do', {
       :actionID => "StartAP",
       :serviceID => "n7yqc6udv2",

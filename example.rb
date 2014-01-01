@@ -3,13 +3,13 @@ require "bundler/setup"
 require './lib/samsung'
 
 config = YAML.load_file('settings.yml')
-log = Logger.new "output.log"
+log = Logger.new STDOUT
 a = Mechanize.new { |agent|
   agent.user_agent = config['user_agent']
 }
 a.log = log
 
-auth = Samsung::Web::Authenticator.new
+auth = Samsung::Web::Authenticator.new(log)
 cookies = auth.login(a, config['user'], config['pass'], 'n7yqc6udv2')
 
 

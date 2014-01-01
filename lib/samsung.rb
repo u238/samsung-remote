@@ -8,11 +8,20 @@ require 'yaml'
 require 'logger'
 require 'openssl'
 require 'logger'
+require 'socket'
 
 module Samsung
   module Web
   end
   module Physical
+  end
+
+  class Factory
+    def self.an_ssl_client(config)
+      context = OpenSSL::SSL::SSLContext.new
+      tcp_client = TCPSocket.new config['ip'], 2878
+      ssl_client = OpenSSL::SSL::SSLSocket.new tcp_client, context 
+    end
   end
 end
 
