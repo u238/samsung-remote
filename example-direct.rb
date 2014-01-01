@@ -2,17 +2,11 @@ require 'rubygems'
 require "bundler/setup"
 require './lib/samsung'
 
-require 'nokogiri'
-require 'rest_client'
-require 'yaml'
-require 'logger'
-require 'openssl'
 
 config = YAML.load_file('settings.yml')
 log = Logger.new STDOUT
 
 require 'socket'
-
 
 def an_ssl_client(config)
   context = OpenSSL::SSL::SSLContext.new

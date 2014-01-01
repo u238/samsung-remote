@@ -2,13 +2,6 @@ require 'rubygems'
 require "bundler/setup"
 require './lib/samsung'
 
-require 'nokogiri'
-require 'rest_client'
-require 'mechanize'
-require 'yaml'
-
-require 'logger'
-
 config = YAML.load_file('settings.yml')
 log = Logger.new "output.log"
 a = Mechanize.new { |agent|
