@@ -10,7 +10,7 @@ class Samsung::Physical::Boracay
     @ssl_client.puts xml
 
     line = @ssl_client.gets
-    @log.info("Reading: #{xml}")
+    @log.info("Reading: #{line}")
     Nokogiri::XML(line)
   end
 
