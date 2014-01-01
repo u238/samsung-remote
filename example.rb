@@ -34,7 +34,7 @@ headers['duid'] = config['duid']
 headers['accept'] = 'application/xml, text/xml, */*; q=0.01'
 headers['cookie'] = options[:cookie]
 
-proxy = Samsung::CommunicationProxy.new
+proxy = Samsung::WebCommunicationProxy.new
 boracay = Samsung::Boracay.new(proxy, headers)
 boracay.control()
 
