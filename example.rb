@@ -9,9 +9,7 @@ a = Mechanize.new { |agent|
 }
 a.log = log
 
-auth = Samsung::Authenticator.new
-
-
+auth = Samsung::Web::Authenticator.new
 cookies = auth.login(a, config['user'], config['pass'], 'n7yqc6udv2')
 
 
@@ -21,14 +19,9 @@ options[:cookie] = cookies.collect { |cookie|
 }.join("; ")
 
 RestClient.log = log
-headers = {}
-headers['master_duid'] = ""
-headers['duid'] = config['duid']
-headers['accept'] = 'application/xml, text/xml, */*; q=0.01'
-headers['cookie'] = options[:cookie]
 
-proxy = Samsung::WebCommunicationProxy.new
-boracay = Samsung::Boracay.new(proxy, headers)
+proxy = Samsung::Web::CommunicationProxy.new
+boracay = Samsung::Web::Boracay.new(proxy, config, options[:cookie])
 boracay.control()
 
 boracay.on()
