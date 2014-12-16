@@ -15,10 +15,11 @@ boracay = Samsung::Physical::Boracay.new(Samsung::Factory.an_ssl_client(config),
 boracay.login!
 
 puts boracay.on().inspect
+pp boracay.get_status
+
 sleep(10)
 puts boracay.operation_mode('Cool').inspect
 sleep(10)
 puts boracay.set_temperature(22).inspect
-# puts boracay.get_temperature.inspect
 sleep(20)
 puts boracay.off().inspect

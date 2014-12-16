@@ -132,8 +132,8 @@ class Samsung::Physical::Boracay
     device_control('AC_FUN_COMODE', mode)
   end
 
-  def get_temperature
-    device_control('AC_FUN_TEMPNOW', '')
+  def get_status
+    send(%Q{<Request Type="DeviceState" DUID="#{@config["duid"]}"></Request>})
   end
 
   def sleep_mode(hours)
