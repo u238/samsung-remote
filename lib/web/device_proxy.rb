@@ -21,7 +21,7 @@ class Samsung::Web::DeviceProxy
     "http://global.samsungsmartappliance.com/Device/#{name}?_=#{timestamp}"
   end
 
-  def getDeviceState()
+  def get_status()
     result = RestClient.get(action('getDeviceState'))
     
     Nokogiri::XML(result)
