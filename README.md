@@ -20,4 +20,4 @@ The Samsung Air conditioners use a strange access token mechanism.
 Follow the [guide](doc/getAccessToken.md) for getting one.
 
 ### Examples
-See example-remote.rb.
+See example-direct.rb.
