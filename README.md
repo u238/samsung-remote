@@ -2,32 +2,22 @@
 
 This project was forked from an [unmantained repository](https://bitbucket.org/CloCkWeRX/samsung-remote/)
 
-# README #
+## Getting Started
 
-This README would normally document whatever steps are necessary to get your application up and running.
+### Install dependencies
 
-### What is this repository for? ###
+#### Fedora 28
+```
+# dnf install rubygem-nokogiri rubygem-mechanize
+```
 
-* Quick summary
-* Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
+### Extract client certifcate
+In order to use the library you need to extract the client certificate from the original
+App. Please follow the [dedicated howto](doc/extractClientCertificate.md).
 
-### How do I get set up? ###
+### Get a Authorization token
+The Samsung Air conditioners use a strange access token mechanism.
+Follow the [guide](doc/getAccessToken.md) for getting one.
 
-* Summary of set up
-* Configuration
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
-
-### Contribution guidelines ###
-
-* Writing tests
-* Code review
-* Other guidelines
-
-### Who do I talk to? ###
-
-* Repo owner or admin
-* Other community or team contact
+### Examples
+See example-remote.rb.
