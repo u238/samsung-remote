@@ -22,7 +22,16 @@ If you java installation doesn't have the BouncyCastleProvider installed, downlo
 the jar from the official [site](https://www.bouncycastle.org/latest_releases.html).
 Then convert the KeyStore with keytool:
 ```
-$ keytool -importkeystore -srckeystore AC14K_M_KeyStore.bks -srcstoretype BKS -destkeystore ac14k_m.pfx -deststoretype PKCS12 -srcalias ac14k_m -deststorepass password -destkeypass password -provider org.bouncycastle.jce.provider.BouncyCastleProvider -providerpath /path/to/bcprov-jdk15on-160.jar
+$ keytool -importkeystore \
+ -srckeystore AC14K_M_KeyStore.bks \
+ -srcstoretype BKS \
+ -destkeystore ac14k_m.pfx \
+ -deststoretype PKCS12 \
+ -srcalias ac14k_m \
+ -deststorepass password \
+ -destkeypass password \
+ -provider org.bouncycastle.jce.provider.BouncyCastleProvider \
+ -providerpath /path/to/bcprov-jdk15on-160.jar
 ```
 
 #### 4. Convert it to PEM format
