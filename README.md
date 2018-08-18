@@ -1,3 +1,7 @@
+# Samsung Smart AC Remote Control Ruby Library
+
+This project was forked from an [unmantained repository](https://bitbucket.org/CloCkWeRX/samsung-remote/)
+
 # README #
 
 This README would normally document whatever steps are necessary to get your application up and running.
