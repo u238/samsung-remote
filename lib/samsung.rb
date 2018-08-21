@@ -19,6 +19,10 @@ module Samsung
   class Factory
     def self.an_ssl_client(config)
       context = OpenSSL::SSL::SSLContext.new
+      context.verify_mode = OpenSSL::SSL::VERIFY_NONE
+      context.cert = OpenSSL::X509::Certificate.new(File.read("cert.pem"))
+      context.key = OpenSSL::PKey::RSA.new(File.read('cert.pem'), '')
+
       tcp_client = TCPSocket.new config['ip'], 2878
       ssl_client = OpenSSL::SSL::SSLSocket.new tcp_client, context 
     end
