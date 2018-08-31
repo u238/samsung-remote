@@ -21,3 +21,6 @@ Follow the [guide](doc/getAccessToken.md) for getting one.
 
 ### Examples
 See example-direct.rb.
+
+### License
+See LICENSE file.
